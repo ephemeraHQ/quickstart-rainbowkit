@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useWalletClient } from "wagmi";
+
 import { Client, useClient } from "@xmtp/react-sdk";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount, useWalletClient } from "wagmi";
 import { ConversationContainer } from "./ConversationContainer";
 
 export default function Home({ wallet, env, isPWA = false, onLogout }) {
+  const { data: walletClient } = useWalletClient();
+
   const initialIsOpen =
     isPWA || localStorage.getItem("isWidgetOpen") === "true" || false;
 
@@ -12,16 +16,21 @@ export default function Home({ wallet, env, isPWA = false, onLogout }) {
   const initialIsConnected =
     (localStorage.getItem("isConnected") && wallet === "true") || false;
 
-  const { client, error, initialize } = useClient();
+  const { client, error, isLoading, initialize } = useClient();
   const [loading, setLoading] = useState(false);
 
   const [isOpen, setIsOpen] = useState(initialIsOpen);
   const [isOnNetwork, setIsOnNetwork] = useState(initialIsOnNetwork);
   const [isConnected, setIsConnected] = useState(initialIsConnected);
 
-  const { data: signer, isError, isLoading } = useWalletClient();
-
   const [selectedConversation, setSelectedConversation] = useState(null);
+  const [signer, setSigner] = useState();
+
+  useEffect(() => {
+    if (walletClient) {
+      setSigner(walletClient);
+    }
+  }, [walletClient]);
 
   const styles = {
     floatingLogo: {
@@ -122,7 +131,7 @@ export default function Home({ wallet, env, isPWA = false, onLogout }) {
 
   useEffect(() => {
     if (wallet) {
-      //setSigner(wallet);
+      setSigner(wallet);
       setIsConnected(true);
     }
     if (client && !isOnNetwork) {
@@ -150,13 +159,13 @@ export default function Home({ wallet, env, isPWA = false, onLogout }) {
   };
 
   const initXmtpWithKeys = async () => {
+    console.log("initXmtpWithKeys", signer);
     const options = {
       env: env ? env : getEnv(),
     };
     const address = await getAddress(signer);
     if (!address) return;
     let keys = loadKeys(address);
-    console.log("keys", keys);
     if (!keys) {
       keys = await Client.getKeys(signer, {
         ...options,
@@ -184,7 +193,7 @@ export default function Home({ wallet, env, isPWA = false, onLogout }) {
     setIsConnected(false);
     const address = await getAddress(signer);
     wipeKeys(address);
-    //setSigner(null);
+    setSigner(null);
     setIsOnNetwork(false);
     setSelectedConversation(null);
     localStorage.removeItem("isOnNetwork");
@@ -239,9 +248,7 @@ export default function Home({ wallet, env, isPWA = false, onLogout }) {
           <div style={styles.widgetContent}>
             {!isConnected && (
               <div style={styles.xmtpContainer}>
-                <button style={styles.btnXmtp} onClick={handleConnectWallet}>
-                  Connect Wallet
-                </button>
+                <ConnectButton />
               </div>
             )}
             {isConnected && !isOnNetwork && (

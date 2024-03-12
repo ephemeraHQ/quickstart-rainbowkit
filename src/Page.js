@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { FloatingInbox } from "./FloatingInbox-hooks";
 import { useAccount, useWalletClient } from "wagmi";
 import { useDisconnect } from "wagmi";
-import { disconnect } from "@wagmi/core";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Page = () => {
   const { disconnect } = useDisconnect();
@@ -52,18 +50,11 @@ const Page = () => {
 
   return (
     <div style={styles.uContainer}>
-      {isDisconnected && (
-        <div style={styles.xmtpContainer}>
-          <ConnectButton />
-        </div>
-      )}
-      {!isDisconnected && walletClient && (
-        <FloatingInbox
-          isPWA={isPWA}
-          wallet={walletClient}
-          onLogout={handleLogout}
-        />
-      )}
+      <FloatingInbox
+        isPWA={isPWA}
+        wallet={walletClient}
+        onLogout={handleLogout}
+      />
     </div>
   );
 };
