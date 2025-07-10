@@ -1,6 +1,11 @@
-# XMTP PWA with RainbowKit
+![Status](https://img.shields.io/badge/Deprecated-brown)
 
-![xmtp](https://github.com/xmtp/xmtp-quickstart-reactjs/assets/1447073/3f2979ec-4d13-4c3d-bf20-deab3b2ffaa1)
+> [!CAUTION]
+> This repository is no longer maintained.
+
+The documentation below is provided for historical reference only.
+
+# XMTP PWA with RainbowKit
 
 ## Installation
 
